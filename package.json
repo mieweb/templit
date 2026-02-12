@@ -17,6 +17,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "prepare": "tsup",
     "dev:lib": "tsup --watch",
     "dev:web": "npm run dev --workspace=web",
     "dev": "npm run dev:web",
