@@ -20,6 +20,8 @@
     "dev:lib": "tsup --watch",
     "dev:web": "npm run dev --workspace=web",
     "dev": "npm run dev:web",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "workspaces": [
@@ -37,7 +39,8 @@
     "@types/js-yaml": "^4",
     "@types/mustache": "^4",
     "tsup": "^8",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.0.18"
   },
   "keywords": [
     "template",
