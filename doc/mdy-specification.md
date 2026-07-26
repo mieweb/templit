@@ -58,6 +58,14 @@ and body are *linked* and should be validated together, while any `.md` tool
 still opens the file untouched. Choosing `.mdyt` signals that the body must be
 rendered (§6) before the file is portable.
 
+**Template syntax belongs only in `.mdyt`.** Interpolations (`{{…}}`) and
+especially block helpers (`{{#each}}`, `{{#if}}`, `{% for %}`) MUST NOT appear
+in a `.mdy` or `.md` body. Most markdown processors do not handle them well:
+placeholders render literally, and block-helper lines break lists, tables, and
+paragraph flow. The whole point of the two-tier split is that everything a
+plain viewer would mangle is consumed by the flatten step (§6.1) and never
+reaches the document tier.
+
 ### 2.1 The template → document pipeline
 
 ```mermaid
@@ -284,7 +292,9 @@ The render step:
 
 Template control flow (`{{#each}}`, `{{#if}}`, `{% for %}`) is consumed by the
 render and never appears in the `.mdy` — the flattened file is loop-free,
-condition-free, and viewer-safe.
+condition-free, and viewer-safe. These constructs are valid *only* in `.mdyt`
+(§2): a `.mdy`/`.md` containing them is non-conformant, and processors SHOULD
+flag leftover template syntax in a document as a diagnostic.
 
 **Note on "no code":** templit expressions are declarative data interpolation
 evaluated by the *host's* templit install at render time — the template cannot
@@ -367,7 +377,9 @@ An MDY processor:
    in the front-matter index — as field links.
 3. MUST round-trip files losslessly (byte-identical body + front matter when
    nothing changed).
-4. SHOULD report dangling links and orphaned data as diagnostics.
+4. SHOULD report dangling links and orphaned data as diagnostics, and SHOULD
+   flag any template syntax (`{{…}}`, `{{#each}}`, `{% … %}`) found in a
+   `.mdy`/`.md` body — template constructs are valid only in `.mdyt` (§2).
 5. MUST NOT execute any content found in a `.mdy` document.
 6. Editors SHOULD update linked spans by editing the data and regenerating the
    display text, and SHOULD unlink a span when the user edits its text directly.
