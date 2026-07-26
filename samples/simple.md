@@ -5,10 +5,10 @@ mdy:
   kind: document
   template: { name: Simple visit note, version: 1.0.0 }
   renderedAt: 2026-07-26T15:00:00Z
-patient:
-  name: Jordan Rivera
-visit:
-  date: 2026-07-02
+patient_name:
+  value: Jordan Rivera
+visit_date:
+  value: 2026-07-02
 height:
   value: 180
   unit: cm
@@ -20,7 +20,7 @@ weight:
 ---
 # Visit Note
 
-**Patient:** [Jordan Rivera](#patient) · **Date:** [2026-07-02](#visit)
+**Patient:** [Jordan Rivera](#patient_name) · **Date:** [2026-07-02](#visit_date)
 
 ## Vitals
 

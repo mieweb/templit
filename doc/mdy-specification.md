@@ -255,13 +255,23 @@ in two ways:
 Flattening is templit rendering with one addition: interpolations are emitted
 as **field links**, not bare text, so the output stays linked to its data.
 
+**Implicit field links** make this automatic. When a template interpolates a
+whole field-shaped variable — an object with `display` and/or `value`
+(+ optional `unit`) — templit renders it in field-link form using the
+variable's own key as the id:
+
 ```markdown
 <!-- encounter.mdyt (template body) -->
-- Weight: [{{vitals.weight.display}}](#vital-wt)
+- Weight: {{weight}}
 
 <!-- encounter.mdy (after applying the data object) -->
-- Weight: [198 lb (89.8 kg)](#vital-wt)
+- Weight: [198 lb (89.8 kg)](#weight)
 ```
+
+Display text is `display` when present, else `value` + `unit`. Explicit paths
+(`{{weight.value}}`, `{{weight.display}}`) interpolate plainly as before — use
+them (with triple-stache for strings needing raw output) to compose custom
+link text, and pass `fieldLinks: false` to disable the behavior entirely.
 
 The render step:
 

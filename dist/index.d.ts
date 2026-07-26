@@ -1,4 +1,11 @@
 type TemplateEngine = "handlebars" | "mustache" | "liquid";
+/** The MDY field shape: an object whose `display`/`value` describe an answer */
+interface FieldObject {
+    display?: unknown;
+    value?: unknown;
+    unit?: unknown;
+    [key: string]: unknown;
+}
 interface ParsedTemplate {
     /** Template content with frontmatter stripped */
     content: string;
@@ -10,6 +17,13 @@ interface ParsedTemplate {
 interface RenderOptions {
     /** Override the engine detected from frontmatter */
     engine?: TemplateEngine;
+    /**
+     * When true (default), field-shaped variables ({ display/value, unit? })
+     * interpolated whole — e.g. `{{height}}` — render as MDY field links
+     * `[display](#height)`. Explicit paths like `{{height.display}}` are
+     * unaffected. Set false for plain engine behavior.
+     */
+    fieldLinks?: boolean;
 }
 interface RenderResult {
     /** Raw rendered output (before markdown conversion) */
@@ -60,4 +74,29 @@ declare function parseVariables(yamlStr: string): Record<string, unknown>;
  */
 declare function mergeVariables(frontmatterVars: Record<string, unknown>, explicitVars: Record<string, unknown>): Record<string, unknown>;
 
-export { type ParsedTemplate, type RenderOptions, type RenderResult, type TemplateEngine, markdownToHtml, mergeVariables, parseTemplate, parseVariables, render, renderWithEngine };
+/**
+ * A variable is treated as a linkable field when it is a plain object carrying
+ * a `display` or `value` key (the MDY field shape).
+ */
+declare function isFieldObject(value: unknown): value is FieldObject;
+/**
+ * Human-readable text for a field: `display` wins; otherwise `value`
+ * (plus ` unit` when present).
+ */
+declare function fieldDisplay(field: FieldObject): string;
+/**
+ * Enable implicit field links: decorate every field-shaped object in the
+ * variables tree with a `toString()` that renders the MDY field-link form
+ * `[display](#id)`, where `id` is the object's own key.
+ *
+ * With this in place, a template can simply write `{{height}}` and get
+ * `[5'11"](#height)` — while explicit paths (`{{height.display}}`,
+ * `{{height.value}}`) keep working unchanged, because property lookups
+ * bypass `toString`.
+ *
+ * The decoration is non-enumerable, so serializing the variables (YAML/JSON)
+ * is unaffected. Mutates and returns the given object.
+ */
+declare function decorateFieldLinks<T extends Record<string, unknown>>(variables: T): T;
+
+export { type FieldObject, type ParsedTemplate, type RenderOptions, type RenderResult, type TemplateEngine, decorateFieldLinks, fieldDisplay, isFieldObject, markdownToHtml, mergeVariables, parseTemplate, parseVariables, render, renderWithEngine };

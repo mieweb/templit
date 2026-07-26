@@ -30,6 +30,9 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
+  decorateFieldLinks: () => decorateFieldLinks,
+  fieldDisplay: () => fieldDisplay,
+  isFieldObject: () => isFieldObject,
   markdownToHtml: () => markdownToHtml,
   mergeVariables: () => mergeVariables,
   parseTemplate: () => parseTemplate,
@@ -63,6 +66,39 @@ function mergeVariables(frontmatterVars, explicitVars) {
   return { ...frontmatterVars, ...explicitVars };
 }
 
+// src/field-links.ts
+function isFieldObject(value) {
+  return !!value && typeof value === "object" && !Array.isArray(value) && ("display" in value || "value" in value);
+}
+function fieldDisplay(field) {
+  if (field.display != null) return String(field.display);
+  const value = field.value != null ? String(field.value) : "";
+  const unit = field.unit != null ? ` ${String(field.unit)}` : "";
+  return `${value}${unit}`;
+}
+function decorateFieldLinks(variables) {
+  const walk = (obj) => {
+    for (const [key, value] of Object.entries(obj)) {
+      if (!value || typeof value !== "object" || Array.isArray(value)) continue;
+      const child = value;
+      if (isFieldObject(child)) {
+        const link = () => `[${fieldDisplay(child)}](#${key})`;
+        for (const method of ["toString", "toHTML"]) {
+          Object.defineProperty(child, method, {
+            value: link,
+            enumerable: false,
+            writable: true,
+            configurable: true
+          });
+        }
+      }
+      walk(child);
+    }
+  };
+  walk(variables);
+  return variables;
+}
+
 // src/render.ts
 async function renderWithEngine(content, variables, engine) {
   switch (engine) {
@@ -88,12 +124,16 @@ async function render(templateStr, variables = {}, options = {}) {
   const engine = options.engine || parsed.engine;
   const explicitVars = typeof variables === "string" ? parseVariables(variables) : variables;
   const merged = mergeVariables(parsed.frontmatterVars, explicitVars);
+  if (options.fieldLinks !== false) decorateFieldLinks(merged);
   const raw = await renderWithEngine(parsed.content, merged, engine);
   const html = await markdownToHtml(raw);
   return { raw, html, engine };
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  decorateFieldLinks,
+  fieldDisplay,
+  isFieldObject,
   markdownToHtml,
   mergeVariables,
   parseTemplate,

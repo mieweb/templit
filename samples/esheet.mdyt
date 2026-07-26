@@ -36,10 +36,10 @@ fields:
 ---
 # Vitals Intake
 
-**{{fields.patient_name.question}}:** [{{fields.patient_name.value}}](#patient_name)
+**{{fields.patient_name.question}}:** {{fields.patient_name}}
 
 ## Vitals
 
-- {{fields.body_height.question}}: [{{fields.body_height.display}}](#body_height)
-- {{fields.body_weight.question}}: [{{fields.body_weight.display}}](#body_weight)
-- {{fields.smoker.question}} [{{fields.smoker.display}}](#smoker)
+- {{fields.body_height.question}}: {{fields.body_height}}
+- {{fields.body_weight.question}}: {{fields.body_weight}}
+- {{fields.smoker.question}} {{fields.smoker}}

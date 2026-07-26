@@ -3,6 +3,7 @@ import { Liquid } from "liquidjs"
 import Handlebars from "handlebars"
 import { marked } from "marked"
 import { parseTemplate, parseVariables, mergeVariables } from "./parse"
+import { decorateFieldLinks } from "./field-links"
 import type { RenderOptions, RenderResult, TemplateEngine } from "./types"
 
 /**
@@ -61,7 +62,13 @@ export async function render(
     typeof variables === "string" ? parseVariables(variables) : variables
 
   const merged = mergeVariables(parsed.frontmatterVars, explicitVars)
-  const raw = await renderWithEngine(parsed.content, merged, engine)
+  // Clone before decorating: gray-matter caches parsed frontmatter, so
+  // mutating the merged tree would leak decorations across render calls.
+  const vars =
+    options.fieldLinks !== false
+      ? decorateFieldLinks(structuredClone(merged))
+      : merged
+  const raw = await renderWithEngine(parsed.content, vars, engine)
   const html = await markdownToHtml(raw)
 
   return { raw, html, engine }
