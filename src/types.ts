@@ -1,10 +1,17 @@
 export type TemplateEngine = "handlebars" | "mustache" | "liquid"
 
-/** The MDY field shape: an object whose `display`/`value` describe an answer */
+/**
+ * The MDY field shape: an object describing an answer via `display`/`value`
+ * (+ optional `unit`), or an eSheet `FieldResponse` (`answer`/`selected`).
+ */
 export interface FieldObject {
   display?: unknown
   value?: unknown
   unit?: unknown
+  /** eSheet FieldResponse: text answer */
+  answer?: unknown
+  /** eSheet FieldResponse: selected option(s) — { id, value } or an array of them */
+  selected?: unknown
   [key: string]: unknown
 }
 

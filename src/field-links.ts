@@ -2,28 +2,43 @@ import type { FieldObject } from "./types"
 
 /**
  * A variable is treated as a linkable field when it is a plain object carrying
- * a `display` or `value` key (the MDY field shape).
+ * a `display`/`value` key (the MDY field shape) or an `answer`/`selected` key
+ * (the eSheet FieldResponse shape).
  */
 export function isFieldObject(value: unknown): value is FieldObject {
   return (
     !!value &&
     typeof value === "object" &&
     !Array.isArray(value) &&
-    ("display" in value || "value" in value)
+    ("display" in value ||
+      "value" in value ||
+      "answer" in value ||
+      "selected" in value)
   )
 }
 
 /**
- * Human-readable text for a field: `display` wins; otherwise `value`
- * (plus ` unit` when present). YAML timestamps (JS Date) render as ISO dates.
+ * Human-readable text for a field: `display` wins; then `value`/`answer`
+ * (plus ` unit` when present); then eSheet `selected` option value(s).
+ * YAML timestamps (JS Date) render as ISO dates.
  */
 export function fieldDisplay(field: FieldObject): string {
   const asText = (v: unknown): string =>
     v instanceof Date ? v.toISOString().slice(0, 10) : String(v)
   if (field.display != null) return asText(field.display)
-  const value = field.value != null ? asText(field.value) : ""
-  const unit = field.unit != null ? ` ${asText(field.unit)}` : ""
-  return `${value}${unit}`
+  const value = field.value ?? field.answer
+  if (value != null) {
+    const unit = field.unit != null ? ` ${asText(field.unit)}` : ""
+    return `${asText(value)}${unit}`
+  }
+  const sel = field.selected
+  if (Array.isArray(sel)) {
+    return sel.map((s) => asText((s as { value?: unknown }).value)).join(", ")
+  }
+  if (sel && typeof sel === "object") {
+    return asText((sel as { value?: unknown }).value)
+  }
+  return ""
 }
 
 /**

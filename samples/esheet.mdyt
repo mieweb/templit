@@ -1,45 +1,55 @@
 ---
-# TEMPLATE (.mdyt) — eSheet resolver: `fields:` map mirrors eSheet
-# FieldDefinition/FieldResponse. Data-bearing (defaults double as a preview);
-# applying a real FormResponse overrides these values.
+# TEMPLATE (.mdyt) — eSheet resolver. Front matter carries two legal eSheet
+# objects (https://esheet.mieweb.org/docs/schema-format):
+#   form:     FormDefinition (pages → fields)
+#   response: FormResponse   (field id → { answer } or { selected })
+# Data-bearing: the response doubles as a preview; applying a real
+# FormResponse overrides it.
 mdy:
   kind: template
   engine: handlebars
   schema: esheet
   name: Vitals intake
   version: 1.0.0
-fields:
+form:
+  id: vitals-intake
+  title: Vitals Intake
+  pages:
+    - id: page_1
+      fields:
+        - id: patient_name
+          fieldType: text
+          question: Full Name
+          required: true
+        - id: body_height
+          fieldType: text
+          question: Height
+          inputType: number
+          unit: cm
+        - id: body_weight
+          fieldType: text
+          question: Weight
+          inputType: number
+          unit: kg
+        - id: smoker
+          fieldType: boolean
+          question: Tobacco use?
+response:
   patient_name:
-    fieldType: text
-    question: Full Name
-    required: true
-    value: Jordan Rivera
+    answer: Jordan Rivera
   body_height:
-    fieldType: text
-    question: Height
-    inputType: number
-    unit: cm
-    value: 180
-    display: "5'11\""
+    answer: "180"
   body_weight:
-    fieldType: text
-    question: Weight
-    inputType: number
-    unit: kg
-    value: 89.8
-    display: 198 lb
+    answer: "89.8"
   smoker:
-    fieldType: boolean
-    question: Tobacco use?
-    value: false
-    display: "No"
+    selected: { id: "no", value: "No" }
 ---
 # Vitals Intake
 
-**{{fields.patient_name.question}}:** {{fields.patient_name}}
+**Full Name:** {{response.patient_name}}
 
 ## Vitals
 
-- {{fields.body_height.question}}: {{fields.body_height}}
-- {{fields.body_weight.question}}: {{fields.body_weight}}
-- {{fields.smoker.question}} {{fields.smoker}}
+- Height: {{response.body_height}} cm
+- Weight: {{response.body_weight}} kg
+- Tobacco use? {{response.smoker}}

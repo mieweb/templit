@@ -54,6 +54,26 @@ describe("implicit field links", () => {
     expect(raw).toContain(`- Height: [5'11"](#height)`)
   })
 
+  it("renders eSheet FieldResponse shapes (answer / selected)", async () => {
+    const tpl = `---
+engine: handlebars
+response:
+  patient_name: { answer: Jordan Rivera }
+  smoker:
+    selected: { id: "no", value: "No" }
+  symptoms:
+    selected:
+      - { id: s1, value: Headache }
+      - { id: s3, value: Fatigue }
+---
+{{response.patient_name}} / {{response.smoker}} / {{response.symptoms}}
+`
+    const { raw } = await render(tpl)
+    expect(raw).toContain("[Jordan Rivera](#patient_name)")
+    expect(raw).toContain("[No](#smoker)")
+    expect(raw).toContain("[Headache, Fatigue](#symptoms)")
+  })
+
   it("can be disabled via fieldLinks: false", async () => {
     const { raw } = await render(vitalsTemplate, {}, { fieldLinks: false })
     expect(raw).toContain("- Height: [object Object]")

@@ -84,7 +84,8 @@ If no `engine` key is present (or the value is unrecognized), **Handlebars** is 
 
 templit's biggest idea: the rendered document shouldn't forget where its data
 came from. When a template interpolates a **field-shaped** variable — an object
-with `display` and/or `value` (+ optional `unit`) — the output is a **field
+with `display` and/or `value` (+ optional `unit`), or an eSheet
+`FieldResponse` (`answer`/`selected`) — the output is a **field
 link**, not bare text:
 
 ```markdown

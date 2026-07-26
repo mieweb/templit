@@ -16,7 +16,7 @@ Working examples for the [MDY specification](../doc/mdy-specification.md)
 | Set | Resolver | Files | Demonstrates |
 |---|---|---|---|
 | **simple** | generic YAML | [simple.mdyt](simple.mdyt) · [simple.mdy](simple.mdy) · [simple.md](simple.md) | Minimal template → document pipeline: patient, visit date, two vitals |
-| **esheet** | eSheet `fields:` map | [esheet.mdyt](esheet.mdyt) · [esheet.mdy](esheet.mdy) · [esheet.md](esheet.md) | eSheet `FieldDefinition`-shaped fields (text, number + unit, boolean); question and answer both interpolated |
+| **esheet** | eSheet `form:` + `response:` | [esheet.mdyt](esheet.mdyt) · [esheet.mdy](esheet.mdy) · [esheet.md](esheet.md) | Legal eSheet [FormDefinition + FormResponse](https://esheet.mieweb.org/docs/schema-format) front matter; implicit links render response answers |
 | **back-pain-encounter** | FHIR R4 | [back-pain-encounter.md](back-pain-encounter.md) | Full clinical encounter: FHIR `Bundle` front matter (Patient, allergy, problem list, coded vitals, controlled Rx, dose adjustment, work restriction, follow-up) with a portable narrative |
 
 Each `.mdyt`/`.mdy` pair is the *same document* before and after flattening —
