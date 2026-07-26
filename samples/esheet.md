@@ -1,0 +1,42 @@
+---
+# Same content as esheet.mdy, shipped with a plain .md extension — renders in
+# any markdown viewer; eSheet-aware systems ingest the `fields:` front matter.
+mdy:
+  kind: document
+  template: { name: Vitals intake, version: 1.0.0 }
+  renderedAt: 2026-07-26T15:00:00Z
+fields:
+  patient_name:
+    fieldType: text
+    question: Full Name
+    required: true
+    value: Jordan Rivera
+  body_height:
+    fieldType: text
+    question: Height
+    inputType: number
+    unit: cm
+    value: 180
+    display: "5'11\""
+  body_weight:
+    fieldType: text
+    question: Weight
+    inputType: number
+    unit: kg
+    value: 89.8
+    display: 198 lb
+  smoker:
+    fieldType: boolean
+    question: Tobacco use?
+    value: false
+    display: "No"
+---
+# Vitals Intake
+
+**Full Name:** [Jordan Rivera](#patient_name)
+
+## Vitals
+
+- Height: [5'11"](#body_height)
+- Weight: [198 lb](#body_weight)
+- Tobacco use? [No](#smoker)

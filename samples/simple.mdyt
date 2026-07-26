@@ -1,0 +1,30 @@
+---
+# TEMPLATE (.mdyt) — data-bearing: the values below are sample defaults, so the
+# template renders as-is for preview; real data overrides them at apply time.
+mdy:
+  kind: template
+  engine: handlebars
+  schema: generic
+  name: Simple visit note
+  version: 1.0.0
+patient:
+  name: Jordan Rivera
+visit:
+  date: 2026-07-02
+height:
+  value: 180
+  unit: cm
+  display: "5'11\""
+weight:
+  value: 89.8
+  unit: kg
+  display: 198 lb
+---
+# Visit Note
+
+**Patient:** [{{patient.name}}](#patient) · **Date:** [{{visit.date}}](#visit)
+
+## Vitals
+
+- Height: [{{height.display}}](#height)
+- Weight: [{{weight.display}}](#weight)

@@ -1,0 +1,28 @@
+---
+# DOCUMENT (.mdy) — flattened from simple.mdyt; no template syntax remains.
+# Front matter is the canonical data; each body link points to an id here.
+mdy:
+  kind: document
+  template: { name: Simple visit note, version: 1.0.0 }
+  renderedAt: 2026-07-26T15:00:00Z
+patient:
+  name: Jordan Rivera
+visit:
+  date: 2026-07-02
+height:
+  value: 180
+  unit: cm
+  display: "5'11\""
+weight:
+  value: 89.8
+  unit: kg
+  display: 198 lb
+---
+# Visit Note
+
+**Patient:** [Jordan Rivera](#patient) · **Date:** [2026-07-02](#visit)
+
+## Vitals
+
+- Height: [5'11"](#height)
+- Weight: [198 lb](#weight)

@@ -1,0 +1,45 @@
+---
+# TEMPLATE (.mdyt) — eSheet resolver: `fields:` map mirrors eSheet
+# FieldDefinition/FieldResponse. Data-bearing (defaults double as a preview);
+# applying a real FormResponse overrides these values.
+mdy:
+  kind: template
+  engine: handlebars
+  schema: esheet
+  name: Vitals intake
+  version: 1.0.0
+fields:
+  patient_name:
+    fieldType: text
+    question: Full Name
+    required: true
+    value: Jordan Rivera
+  body_height:
+    fieldType: text
+    question: Height
+    inputType: number
+    unit: cm
+    value: 180
+    display: "5'11\""
+  body_weight:
+    fieldType: text
+    question: Weight
+    inputType: number
+    unit: kg
+    value: 89.8
+    display: 198 lb
+  smoker:
+    fieldType: boolean
+    question: Tobacco use?
+    value: false
+    display: "No"
+---
+# Vitals Intake
+
+**{{fields.patient_name.question}}:** [{{fields.patient_name.value}}](#patient_name)
+
+## Vitals
+
+- {{fields.body_height.question}}: [{{fields.body_height.display}}](#body_height)
+- {{fields.body_weight.question}}: [{{fields.body_weight.display}}](#body_weight)
+- {{fields.smoker.question}} [{{fields.smoker.display}}](#smoker)
