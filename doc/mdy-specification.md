@@ -2,6 +2,7 @@
 
 **Status:** Draft proposal · **File extensions:** `.mdy` (document), `.mdyt` (template); both valid as plain `.md`
 **Audience:** developers and medical-informatics professionals
+**Examples:** [samples/README.md](../samples/README.md)
 
 ## 1. What is MDY?
 
@@ -281,6 +282,10 @@ smuggle in arbitrary execution any more than a Mustache email template can.
 The rendered `.mdy` contains no expressions at all.
 
 ## 7. Examples
+
+Runnable versions of these examples — including full `.mdyt`/`.mdy`/`.md`
+trios you can diff to see the flatten step — are indexed in
+[samples/README.md](../samples/README.md).
 
 ### 7.1 Minimal (eSheet resolver)
 
