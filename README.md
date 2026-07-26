@@ -1,12 +1,21 @@
 # templit
 
-**templit** is a TypeScript template rendering engine that turns markdown templates into HTML — with built-in support for **Handlebars**, **Mustache**, and **Liquid** syntax, YAML frontmatter, and YAML-driven variables.
+**Documents that stay connected to their data.**
 
-Write a document once as a reusable template. Fill it with data. Get back clean, rendered HTML. It's perfect for generating contracts, agreements, reports, emails, and any other document you need to produce programmatically.
+**templit** is a TypeScript template engine for markdown: YAML front matter in,
+clean markdown and HTML out — via **Handlebars**, **Mustache**, or **Liquid**.
+Write a document once as a reusable template, fill it with data, and every
+rendered value stays *linked* back to the field it came from.
+
+It's the reference implementation of the **[MDY format](doc/mdy-specification.md)**:
+a two-tier standard where `.mdyt` templates flatten into `.mdy` documents that
+any markdown viewer can read — contracts, quotes, patient encounters, reports —
+while editors that know the format can edit the data and the prose as one.
 
 ## Why It's Cool
 
 - **Three engines, one API** — use Handlebars, Mustache, or Liquid interchangeably. Pick the syntax you know best, or switch per-template.
+- **Implicit field links** — interpolate a whole field object and templit emits `[display](#id)` markdown that stays addressable back to the front matter (see [MDY & MDYT](#mdy--mdyt-linked-documents)).
 - **Frontmatter-first** — declare the engine and default variable values right in the template using YAML frontmatter. No configuration files needed.
 - **YAML variables** — supply data as a YAML string or a plain JavaScript object. Frontmatter defaults are automatically merged with any overrides you pass in.
 - **Markdown → HTML pipeline** — rendered output is automatically converted to HTML via `marked`, so your templates can use headings, bold, lists, tables, and more.
@@ -70,6 +79,41 @@ engine: liquid
 ```
 
 If no `engine` key is present (or the value is unrecognized), **Handlebars** is used by default.
+
+## MDY & MDYT: Linked Documents
+
+templit's biggest idea: the rendered document shouldn't forget where its data
+came from. When a template interpolates a **field-shaped** variable — an object
+with `display` and/or `value` (+ optional `unit`) — the output is a **field
+link**, not bare text:
+
+```markdown
+---
+height: { value: 180, unit: cm, display: "5'11\"" }
+---
+- Height: {{height}}
+```
+
+renders as
+
+```markdown
+- Height: [5'11"](#height)
+```
+
+Plain markdown viewers just see a link. MDY-aware editors see an addressable
+span wired to the front matter — edit the data, and the prose updates.
+Explicit paths (`{{height.value}}`) still interpolate plainly, and
+`fieldLinks: false` disables the behavior.
+
+This is the flatten step of the two-tier **MDY format**:
+
+| Extension | Tier | Template syntax (`{{…}}`, `{{#each}}`)? | Opens in any markdown viewer? |
+|---|---|---|---|
+| `.mdyt` | Template | Yes | No — render it first |
+| `.mdy` / `.md` | Document | Never | Yes |
+
+- **Specification:** [doc/mdy-specification.md](doc/mdy-specification.md)
+- **Runnable samples** (`.mdyt` → `.mdy` → `.md` trios, incl. a FHIR patient encounter): [samples/README.md](samples/README.md)
 
 ## Frontmatter Variables
 
@@ -196,14 +240,17 @@ npm run dev
 ## Project Structure
 
 ```
-src/           # Library source (TypeScript)
-  index.ts     # Public exports
-  parse.ts     # Frontmatter and YAML parsing
-  render.ts    # Template rendering and markdown conversion
-  types.ts     # TypeScript types
-test/          # Unit tests (Vitest)
-web/           # Interactive playground (Next.js)
-dist/          # Compiled output (ESM + CJS)
+src/             # Library source (TypeScript)
+  index.ts       # Public exports
+  parse.ts       # Frontmatter and YAML parsing
+  render.ts      # Template rendering and markdown conversion
+  field-links.ts # Implicit field-link decoration (MDY)
+  types.ts       # TypeScript types
+doc/             # MDY/MDYT format specification
+samples/         # Runnable .mdyt/.mdy/.md sample sets
+test/            # Unit tests (Vitest)
+web/             # Interactive playground (Next.js)
+dist/            # Compiled output (ESM + CJS)
 ```
 
 ## License
