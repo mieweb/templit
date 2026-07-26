@@ -54,8 +54,8 @@ entry:
       status: final
       code: { coding: [{ system: http://loinc.org, code: 85354-9, display: Blood pressure }] }
       component:
-        - { code: { coding: [{ system: http://loinc.org, code: 8480-6, display: Systolic }] }, valueQuantity: { value: 138, unit: mmHg, code: mm[Hg] } }
-        - { code: { coding: [{ system: http://loinc.org, code: 8462-4, display: Diastolic }] }, valueQuantity: { value: 86, unit: mmHg, code: mm[Hg] } }
+        - { code: { coding: [{ system: http://loinc.org, code: 8480-6, display: Systolic }] }, valueQuantity: { value: 138, unit: mmHg, code: "mm[Hg]" } }
+        - { code: { coding: [{ system: http://loinc.org, code: 8462-4, display: Diastolic }] }, valueQuantity: { value: 86, unit: mmHg, code: "mm[Hg]" } }
   - id: vital-hr
     resource: { resourceType: Observation, status: final, code: { coding: [{ system: http://loinc.org, code: 8867-4, display: Heart rate }] }, valueQuantity: { value: 78, unit: /min, code: /min } }
   - id: vital-temp
