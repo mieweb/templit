@@ -126,6 +126,16 @@ YAML is declared by the data itself and interpreted by a **resolver** (§5):
 | `templit` | Flat/nested variables consumed by Handlebars/Mustache/Liquid interpolation | vendor/templit |
 | *(generic)* | Any YAML standard object — e.g., an ANSI X12 837 claim expressed in YAML — as long as linked nodes have ids | §5 |
 
+> **Authoring pitfall — quote YAML-special values.** Clinical and standards
+> vocabularies are full of strings that are *not* safe as bare YAML scalars,
+> especially inside flow mappings (`{ ... }`): UCUM codes like `mm[Hg]` and
+> `[degF]` (`[` starts a flow sequence), `%`, values with `:`, `#`, or leading
+> `*`/`&`. One unquoted `code: mm[Hg]` makes the entire front matter — and thus
+> the whole document — unparseable. Always quote such values
+> (`code: "mm[Hg]"`); emitters SHOULD serialize with a YAML library rather than
+> string templates, and validators SHOULD surface front-matter parse errors as
+> a document-level diagnostic.
+
 ### 3.2 Body — linked narrative
 
 A **field link** is an ordinary markdown link whose destination names a
