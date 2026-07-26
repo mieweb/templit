@@ -131,7 +131,7 @@ YAML is declared by the data itself and interpreted by a **resolver** (§5):
 | Resolver | Front-matter shape | Canonical example |
 |---|---|---|
 | `fhir` | A FHIR R4 resource or `Bundle`; each `entry` has `id` + `resource` | [samples/back-pain-encounter.md](../samples/back-pain-encounter.md) |
-| `esheet` | `fields:` map keyed by field id, values mirror eSheet `FieldDefinition`/`FieldResponse` | §7.1 |
+| `esheet` | `form:` (eSheet `FormDefinition`, pages → fields) + `response:` (eSheet `FormResponse`, field id → `answer`/`selected`) per the [eSheet schema format](https://esheet.mieweb.org/docs/schema-format) | §7.1 |
 | `templit` | Flat/nested variables consumed by Handlebars/Mustache/Liquid interpolation | vendor/templit |
 | *(generic)* | Any YAML standard object — e.g., an ANSI X12 837 claim expressed in YAML — as long as linked nodes have ids | §5 |
 
@@ -237,9 +237,9 @@ Proposed initial resolvers:
 
 - **`templit`** — build on the existing templit library (gray-matter front
   matter + variable interpolation) as the base parse/merge layer.
-- **`esheet`** — front-matter `fields:` map mirroring eSheet
-  `FieldDefinition`/`FieldResponse`; chip activation opens the matching eSheet
-  field component.
+- **`esheet`** — front matter carries a legal eSheet `form:` (FormDefinition)
+  and `response:` (FormResponse); link ids are response field ids; chip
+  activation opens the matching eSheet field component.
 - **`fhir`** — FHIR R4 resources/Bundles; ids are `entry.id`; validation
   against resource schemas; components per resource type.
 - **`generic`** — any YAML object graph (e.g., ANSI X12 837 in YAML); links
@@ -265,7 +265,8 @@ as **field links**, not bare text, so the output stays linked to its data.
 
 **Implicit field links** make this automatic. When a template interpolates a
 whole field-shaped variable — an object with `display` and/or `value`
-(+ optional `unit`) — templit renders it in field-link form using the
+(+ optional `unit`), or an eSheet `FieldResponse` (`answer`/`selected`) —
+templit renders it in field-link form using the
 variable's own key as the id:
 
 ```markdown
@@ -311,18 +312,27 @@ trios you can diff to see the flatten step — are indexed in
 
 ```markdown
 ---
-fields:
-  body_height: { fieldType: text, question: Height, value: 180,  unit: cm }
-  body_weight: { fieldType: text, question: Weight, value: 89.8, unit: kg }
+form:
+  id: vitals-intake
+  pages:
+    - id: page_1
+      fields:
+        - { id: body_height, fieldType: text, question: Height, inputType: number, unit: cm }
+        - { id: body_weight, fieldType: text, question: Weight, inputType: number, unit: kg }
+response:
+  body_height: { answer: "180" }
+  body_weight: { answer: "89.8" }
 ---
 ## Vitals
-- Height: [5'11"](#body_height)
-- Weight: [198 lb](#body_weight)
+- Height: [180](#body_height) cm
+- Weight: [89.8](#body_weight) kg
 ```
 
-Front matter stores the normalized value (`180 cm`); the body shows the
-clinician-friendly rendering (`5'11"`). Editing "Height" in Kerebron opens the
-eSheet text-field component bound to `fields.body_height`.
+The front matter is a legal eSheet `FormDefinition` + `FormResponse`
+([schema format](https://esheet.mieweb.org/docs/schema-format)) — an eSheet
+system can ingest it unchanged. Link ids are the response's field ids; editing
+"Height" in Kerebron opens the eSheet text-field component bound to
+`response.body_height`.
 
 ### 7.2 Clinical document (FHIR resolver)
 
@@ -376,7 +386,10 @@ An MDY processor:
 2. MUST treat body links matching `#<id>` or `mdy:<id>` — where `<id>` exists
    in the front-matter index — as field links.
 3. MUST round-trip files losslessly (byte-identical body + front matter when
-   nothing changed).
+   nothing changed). Edits SHOULD produce minimal diffs: unedited lines —
+   including YAML comments, key order, quoting style, and blank lines —
+   SHOULD be preserved byte-for-byte (write front matter with a
+   format-preserving YAML API, not load → dump).
 4. SHOULD report dangling links and orphaned data as diagnostics, and SHOULD
    flag any template syntax (`{{…}}`, `{{#each}}`, `{% … %}`) found in a
    `.mdy`/`.md` body — template constructs are valid only in `.mdyt` (§2).
