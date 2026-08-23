@@ -1,15 +1,46 @@
 {
-  "name": "templit",
-  "version": "0.1.0",
+  "name": "@mieweb/templit",
+  "version": "0.2.0",
   "description": "Template rendering engine with frontmatter support — Handlebars, Mustache, and Liquid",
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "sideEffects": [
+    "./dist/all.js",
+    "./dist/all.mjs"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
-    }
+    },
+    "./all": {
+      "types": "./dist/all.d.ts",
+      "import": "./dist/all.mjs",
+      "require": "./dist/all.js"
+    },
+    "./markdown": {
+      "types": "./dist/markdown.d.ts",
+      "import": "./dist/markdown.mjs",
+      "require": "./dist/markdown.js"
+    },
+    "./handlebars": {
+      "types": "./dist/engines/handlebars.d.ts",
+      "import": "./dist/engines/handlebars.mjs",
+      "require": "./dist/engines/handlebars.js"
+    },
+    "./mustache": {
+      "types": "./dist/engines/mustache.d.ts",
+      "import": "./dist/engines/mustache.mjs",
+      "require": "./dist/engines/mustache.js"
+    },
+    "./liquid": {
+      "types": "./dist/engines/liquid.d.ts",
+      "import": "./dist/engines/liquid.mjs",
+      "require": "./dist/engines/liquid.js"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -18,6 +49,7 @@
   "scripts": {
     "build": "tsup",
     "prepare": "tsup",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build",
     "dev:lib": "tsup --watch",
     "dev:web": "npm run dev --workspace=web",
     "dev": "npm run dev:web",
@@ -29,16 +61,27 @@
     "web"
   ],
   "dependencies": {
-    "gray-matter": "4.0.3",
-    "handlebars": "4.7.8",
-    "js-yaml": "4.1.0",
-    "liquidjs": "10.21.1",
-    "marked": "16.3.0",
-    "mustache": "4.2.0"
+    "js-yaml": "4.1.0"
+  },
+  "peerDependencies": {
+    "handlebars": "^4.7.8",
+    "liquidjs": "^10.21.1",
+    "marked": "^16.3.0",
+    "mustache": "^4.2.0"
+  },
+  "peerDependenciesMeta": {
+    "handlebars": { "optional": true },
+    "liquidjs": { "optional": true },
+    "marked": { "optional": true },
+    "mustache": { "optional": true }
   },
   "devDependencies": {
     "@types/js-yaml": "^4",
     "@types/mustache": "^4",
+    "handlebars": "4.7.8",
+    "liquidjs": "10.21.1",
+    "marked": "16.3.0",
+    "mustache": "4.2.0",
     "tsup": "^8",
     "typescript": "^5",
     "vitest": "^4.0.18"
@@ -50,7 +93,19 @@
     "mustache",
     "liquid",
     "frontmatter",
-    "markdown"
+    "markdown",
+    "mdy"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mieweb/templit.git"
+  },
+  "homepage": "https://github.com/mieweb/templit#readme",
+  "bugs": {
+    "url": "https://github.com/mieweb/templit/issues"
+  },
   "license": "MIT"
 }

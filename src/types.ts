@@ -1,4 +1,24 @@
-export type TemplateEngine = "handlebars" | "mustache" | "liquid"
+/** Built-in engine names — any registered custom name is accepted too. */
+export type TemplateEngineName =
+  | "handlebars"
+  | "mustache"
+  | "liquid"
+  | (string & {})
+
+/** @deprecated Use {@link TemplateEngineName}. */
+export type TemplateEngine = TemplateEngineName
+
+/** A template engine implementation, as exported by `@mieweb/templit/<name>`. */
+export interface Engine {
+  /** Name matched against the frontmatter `engine:` key */
+  name: string
+  render(
+    content: string,
+    variables: Record<string, unknown>,
+  ): string | Promise<string>
+}
+
+export type MarkdownRenderer = (markdown: string) => string | Promise<string>
 
 /**
  * The MDY field shape: an object describing an answer via `display`/`value`
@@ -19,14 +39,19 @@ export interface ParsedTemplate {
   /** Template content with frontmatter stripped */
   content: string
   /** Detected engine from frontmatter (defaults to "handlebars") */
-  engine: TemplateEngine
+  engine: TemplateEngineName
   /** Variables extracted from frontmatter (excluding engine) */
   frontmatterVars: Record<string, unknown>
 }
 
 export interface RenderOptions {
-  /** Override the engine detected from frontmatter */
-  engine?: TemplateEngine
+  /** Override the engine detected from frontmatter — a registered name or an imported engine */
+  engine?: TemplateEngineName | Engine
+  /**
+   * Markdown→HTML renderer for `RenderResult.html`. Defaults to the one
+   * registered via `registerMarkdown`; pass `false` to skip HTML conversion.
+   */
+  markdown?: MarkdownRenderer | false
   /**
    * When true (default), field-shaped variables ({ display/value, unit? })
    * interpolated whole — e.g. `{{height}}` — render as MDY field links
@@ -39,8 +64,8 @@ export interface RenderOptions {
 export interface RenderResult {
   /** Raw rendered output (before markdown conversion) */
   raw: string
-  /** HTML output (after markdown conversion) */
-  html: string
+  /** HTML output — undefined when no markdown renderer is registered or provided */
+  html?: string
   /** The engine that was used */
-  engine: TemplateEngine
+  engine: TemplateEngineName
 }

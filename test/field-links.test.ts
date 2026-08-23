@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { render } from "../src/render"
+import { render } from "../src/all"
 import { decorateFieldLinks, fieldDisplay, isFieldObject } from "../src/field-links"
 
 const vitalsTemplate = `---

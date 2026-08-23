@@ -235,8 +235,8 @@ An unrecognized schema simply falls back to the generic YAML resolver
 
 Proposed initial resolvers:
 
-- **`templit`** — build on the existing templit library (gray-matter front
-  matter + variable interpolation) as the base parse/merge layer.
+- **`templit`** — build on the existing templit library (YAML front matter
+  extraction + variable interpolation) as the base parse/merge layer.
 - **`esheet`** — front matter carries a legal eSheet `form:` (FormDefinition)
   and `response:` (FormResponse); link ids are response field ids; chip
   activation opens the matching eSheet field component.
@@ -247,7 +247,7 @@ Proposed initial resolvers:
 
 ## 6. Templates: MDYT and templit
 
-templit already provides the template half: gray-matter extraction, YAML
+templit already provides the template half: front matter extraction, YAML
 variable parsing, merge semantics (`parseTemplate`, `parseVariables`,
 `mergeVariables`), and rendering via Handlebars/Mustache/Liquid. MDY extends it
 in two ways:

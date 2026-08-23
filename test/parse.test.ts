@@ -90,6 +90,25 @@ describe("parseTemplate", () => {
     expect(result.content.trim()).toBe("Hello {{name}}")
     expect(result.frontmatterVars).toEqual({})
   })
+
+  it("handles empty frontmatter", () => {
+    const result = parseTemplate("---\n---\nHello {{name}}")
+    expect(result.frontmatterVars).toEqual({})
+    expect(result.content).toBe("Hello {{name}}")
+  })
+
+  it("handles CRLF line endings", () => {
+    const result = parseTemplate("---\r\nname: Alice\r\n---\r\nHi {{name}}")
+    expect(result.frontmatterVars).toEqual({ name: "Alice" })
+    expect(result.content).toBe("Hi {{name}}")
+  })
+
+  it("ignores a horizontal rule that is not leading frontmatter", () => {
+    const template = "Intro\n\n---\n\nOutro"
+    const result = parseTemplate(template)
+    expect(result.frontmatterVars).toEqual({})
+    expect(result.content).toBe(template)
+  })
 })
 
 describe("parseVariables", () => {

@@ -1,8 +1,9 @@
-import matter from "gray-matter"
 import yaml from "js-yaml"
-import type { ParsedTemplate, TemplateEngine } from "./types"
+import { splitFrontmatter } from "./frontmatter"
+import { hasEngine } from "./registry"
+import type { ParsedTemplate, TemplateEngineName } from "./types"
 
-const VALID_ENGINES: TemplateEngine[] = ["handlebars", "mustache", "liquid"]
+const BUILTIN_ENGINES = ["handlebars", "mustache", "liquid"]
 
 /**
  * Parse a template string, extracting frontmatter metadata and variables.
@@ -10,11 +11,15 @@ const VALID_ENGINES: TemplateEngine[] = ["handlebars", "mustache", "liquid"]
  * All other frontmatter keys are treated as template variables.
  */
 export function parseTemplate(templateStr: string): ParsedTemplate {
-  const { data: frontmatter, content } = matter(templateStr)
+  const { frontmatter: yamlStr, content } = splitFrontmatter(templateStr)
+  const frontmatter = parseVariables(yamlStr)
 
-  const detectedEngine = VALID_ENGINES.includes(frontmatter.engine)
-    ? (frontmatter.engine as TemplateEngine)
-    : "handlebars"
+  const named = frontmatter.engine
+  const detectedEngine =
+    typeof named === "string" &&
+    (BUILTIN_ENGINES.includes(named) || hasEngine(named))
+      ? (named as TemplateEngineName)
+      : "handlebars"
 
   const { engine: _engine, ...frontmatterVars } = frontmatter
 

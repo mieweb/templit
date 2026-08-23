@@ -1,41 +1,24 @@
-import Mustache from "mustache"
-import { Liquid } from "liquidjs"
-import Handlebars from "handlebars"
-import { marked } from "marked"
 import { parseTemplate, parseVariables, mergeVariables } from "./parse"
 import { decorateFieldLinks } from "./field-links"
-import type { RenderOptions, RenderResult, TemplateEngine } from "./types"
+import { getMarkdown, resolveEngine } from "./registry"
+import type {
+  Engine,
+  RenderOptions,
+  RenderResult,
+  TemplateEngineName,
+} from "./types"
 
 /**
- * Render a template string with the specified engine.
+ * Render a template string with the given engine — either an imported `Engine`
+ * or the name of one registered via `registerEngine`.
  * Does NOT process frontmatter or markdown — use `render()` for the full pipeline.
  */
 export async function renderWithEngine(
   content: string,
   variables: Record<string, unknown>,
-  engine: TemplateEngine,
+  engine: TemplateEngineName | Engine,
 ): Promise<string> {
-  switch (engine) {
-    case "liquid": {
-      const liquid = new Liquid()
-      return liquid.parseAndRender(content, variables)
-    }
-    case "mustache":
-      return Mustache.render(content, variables)
-    case "handlebars":
-    default: {
-      const compiled = Handlebars.compile(content)
-      return compiled(variables)
-    }
-  }
-}
-
-/**
- * Convert a markdown string to HTML.
- */
-export async function markdownToHtml(markdown: string): Promise<string> {
-  marked.setOptions({ breaks: true, gfm: true })
-  return marked(markdown)
+  return resolveEngine(engine).render(content, variables)
 }
 
 /**
@@ -44,7 +27,7 @@ export async function markdownToHtml(markdown: string): Promise<string> {
  * 2. Parse YAML variables string
  * 3. Merge variables (frontmatter defaults, explicit overrides)
  * 4. Render through the detected template engine
- * 5. Convert markdown output to HTML
+ * 5. Convert markdown output to HTML (when a markdown renderer is available)
  *
  * @param templateStr - Template string with optional frontmatter
  * @param variables   - YAML string or pre-parsed variables object
@@ -56,20 +39,22 @@ export async function render(
   options: RenderOptions = {},
 ): Promise<RenderResult> {
   const parsed = parseTemplate(templateStr)
-  const engine = options.engine || parsed.engine
+  const engine = resolveEngine(options.engine || parsed.engine)
 
   const explicitVars =
     typeof variables === "string" ? parseVariables(variables) : variables
 
   const merged = mergeVariables(parsed.frontmatterVars, explicitVars)
-  // Clone before decorating: gray-matter caches parsed frontmatter, so
-  // mutating the merged tree would leak decorations across render calls.
+  // Clone before decorating so the toString/toHTML overrides never leak into a
+  // caller's variables object across render calls.
   const vars =
     options.fieldLinks !== false
       ? decorateFieldLinks(structuredClone(merged))
       : merged
-  const raw = await renderWithEngine(parsed.content, vars, engine)
-  const html = await markdownToHtml(raw)
+  const raw = await engine.render(parsed.content, vars)
 
-  return { raw, html, engine }
+  const markdown = options.markdown ?? getMarkdown()
+  const html = markdown ? await markdown(raw) : undefined
+
+  return { raw, html, engine: engine.name }
 }

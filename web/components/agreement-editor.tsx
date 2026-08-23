@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from "react"
 import { Editor } from "@monaco-editor/react"
-import { render, parseTemplate } from "templit"
-import type { TemplateEngine } from "templit"
+import { render, parseTemplate } from "@mieweb/templit/all"
+import type { TemplateEngine } from "@mieweb/templit"
 import { FileText, Code2, Eye, ExternalLink } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
@@ -668,7 +668,7 @@ export default function AgreementEditor() {
       setEngine(parsed.engine)
 
       const result = await render(template, variables)
-      setPreview(result.html)
+      setPreview(result.html ?? "")
     } catch (error) {
       console.error("[v0] Preview render error:", error)
       setPreview(`<div style="color: #ef4444; padding: 1rem;">

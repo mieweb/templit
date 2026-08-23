@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { render, renderWithEngine, markdownToHtml } from "../src/render"
+import { render, renderWithEngine, markdownToHtml } from "../src/all"
 
 describe("renderWithEngine", () => {
   const vars = {
